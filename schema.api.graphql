@@ -1,0 +1,157 @@
+schema {
+    query: Query
+    mutation: Mutation
+}
+
+type Query {
+    getImageUploadUrl(extension: String, contentType: String):AWSURL!
+
+    getMyTimeline(limit: int!, nextToken: String): TweetsPage!
+
+    getMyProfile: Profile!
+
+    getProfile(screenName: String!): OtherProfile!
+
+    getTweets(userId: ID!, limit: int!, nextToken: String): TweetsPage!
+
+    getLikes(userId: ID!, limit: int!, nextToken: String): TweetsPage!
+
+    getFollowers(userId: ID!, limit: int!, nextToken: String) : ProfilesPage!
+    
+    getFollowing(userId: ID!, limit: int!, nextToken: String) : ProfilesPage!
+}
+
+type Mutation {
+    editMyProfile(newProfile: ProfileInput!): MyProfile!
+
+    tweet(text: String!): Tweet!
+
+    like(tweetId: ID!): Boolean!
+
+    unlike(tweetId: ID!): Boolean!
+
+    retweet(tweetId: ID!): Boolean!
+
+    unretweet(tweetId: ID!, text: String!): Boolean!
+
+    reply(tweetId: ID!): Boolean!
+
+    follow(tweetId: ID!): Boolean!
+
+    unfollow(tweetId: ID!): Boolean!
+}
+
+input ProfileInput {
+    name: String!
+    imageUrl: AWSURL
+    backgroundImageUrl: AWSURL
+    bio: String
+    location: String
+    website: AWSURL
+    birthdate: AWSDate
+}
+
+interface IProfile {
+    id: ID!
+    name: String!
+    screenName: String!
+    imageUrl: AWSURL
+    backgroundImageUrl: AWSURL
+    bio: String
+    location: String
+    website: AWSURL
+    birthdate: AWSDate
+    createdAt: AWSDateTime!
+    tweets: TweetsPage
+    followersCount: Int!
+    followingCount: Int!
+    tweetsCount: Int!
+    likesCount: Int!
+}
+
+type MyProfile implements IProfile {
+    id: ID!
+    name: String!
+    screenName: String!
+    imageUrl: AWSURL
+    backgroundImageUrl: AWSURL
+    bio: String
+    location: String
+    website: AWSURL
+    birthdate: AWSDate
+    createdAt: AWSDateTime!
+    tweets: TweetsPage
+    followersCount: Int!
+    followingCount: Int!
+    tweetsCount: Int!
+    likesCount: Int!
+}
+
+type OtherProfile implements IProfile {
+    id: ID!
+    name: String!
+    screenName: String!
+    imageUrl: AWSURL
+    backgroundImageUrl: AWSURL
+    bio: String
+    location: String
+    website: AWSURL
+    birthdate: AWSDate
+    createdAt: AWSDateTime!
+    tweets: TweetsPage
+    followersCount: Int!
+    followingCount: Int!
+    tweetsCount: Int!
+    likesCount: Int!
+    following: Boolean!
+    followedBy: Boolean!
+}
+
+interface ITweet {
+    id: ID!
+    profile: IProfile!
+    createdAt: AWSDateTime!
+}
+
+type Tweet implements ITweet {
+    id: ID!
+    profile: IProfile!
+    createdAt: AWSDateTime!
+    text: String!
+    replies: Int!
+    likes : Int!
+    retweets: Int!
+    liked: Boolean!
+    retweeted: Boolean!
+}
+
+type Reply implements ITweet {
+    id: ID!
+    profile: IProfile!
+    createdAt: AWSDateTime!
+    inReplyToTweet: Tweet!
+    inReplyToUser: IProfile!
+    text: String!
+    replies: Int!
+    likes : Int!
+    retweets: Int!
+    liked: Boolean!
+    retweeted: Boolean!
+}
+
+type Retweet implements ITweet {
+    id: ID!
+    profile: IProfile!
+    createdAt: AWSDateTime!
+    retweetOf: ITweet!
+}
+
+type TweetsPage {
+    tweets: [ITweet!]
+    nextToken: String
+}
+
+type ProfilesPage {
+    profiles: [IProfile!]
+    nextToken: String
+}
